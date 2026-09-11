@@ -21,3 +21,6 @@ while True:
 
     # Accept Stock value as Integers
     stock_value = int(user_input)
+
+    # Keep a running total of the inventory
+    inventory += stock_value
