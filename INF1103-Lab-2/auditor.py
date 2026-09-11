@@ -13,3 +13,7 @@ while True:
         print("You have quit!")
         break
 
+    # Accept Stock value as Integers
+    if user_input.isdigit() == False:
+        print("Please enter an integer")
+        failed_entries += 1
