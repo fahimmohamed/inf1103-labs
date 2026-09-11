@@ -24,3 +24,8 @@ while True:
 
     # Keep a running total of the inventory
     inventory += stock_value
+
+    # Trigger overstock alert
+    if inventory > 500:
+        print("ALERT: Stock Value exceeded 500 units.")
+        break
