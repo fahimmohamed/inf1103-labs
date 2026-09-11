@@ -14,6 +14,7 @@ while True:
         break
 
     # Handle invalid input
+    # No negative numbers
     if user_input.isdigit() == False:
         print("Please enter a positive integer")
         failed_entries += 1
