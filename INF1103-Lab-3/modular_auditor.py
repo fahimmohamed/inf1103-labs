@@ -28,3 +28,7 @@ def get_valid_input():
 #Calculate new total
 def process_delivery(current_total, new_value):
     return current_total + new_value
+
+#Returns tax
+def calculate_tax(amount):
+    return amount * 0.1
