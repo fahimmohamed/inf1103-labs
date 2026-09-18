@@ -32,3 +32,10 @@ def process_delivery(current_total, new_value):
 #Returns tax
 def calculate_tax(amount):
     return amount * 0.1
+
+#Final summary
+def generate_report(total_units, failed_attempts):
+    print("\n--- Final Audit Report ---")
+    print(f"Total Units in Inventory: {total_units}")
+    print(f"Number of Failed/Rejected Entries: {failed_attempts}")
+    return
