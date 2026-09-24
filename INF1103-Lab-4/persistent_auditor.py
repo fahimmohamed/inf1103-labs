@@ -16,6 +16,8 @@ def load_inventory():
     if not os.path.exists(filename):
         print("Inventory does not exist")
         return 0, []
+    else:
+        print("Inventory exists!")
 
     with open(filename, "r") as file:
         lines = file.read().splitlines()
@@ -23,6 +25,8 @@ def load_inventory():
     if not lines:
         print("Inventory is empty")
         return 0, []
+    else:
+        print("Inventory is not empty!")
 
     total_inventory = int(lines[0].strip())
 
@@ -33,7 +37,14 @@ def load_inventory():
 
     return total_inventory, inventory_history
 
+#Save inventory
+def save_inventory(total_units, history_list):
+    with open(filename, "w") as file:
+        file.write(f"{total_units}\n")
+        for transaction in history_list:
+            file.write(f"{transaction}\n")
 
+    print("Order successfully saved to inventory.txt")
 
     
 #Handles prompt
@@ -95,6 +106,8 @@ while True:
         continue
 
     stock_value = result
+
+    transaction_history.append(stock_value)
     
     # Process the delivery total using our function
     inventory = process_delivery(inventory, stock_value)
@@ -106,6 +119,6 @@ while True:
     # Update our successful delivery counter
     deliveries_processed += 1
 
-
+save_inventory(inventory, transaction_history)
 
 generate_report(inventory, deliveries_processed, failed_entries, total_tax, transaction_history)
