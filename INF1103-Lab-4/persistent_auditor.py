@@ -125,11 +125,10 @@ for order in transaction_history:
 
 print("--- ALL CURRENT INVENTORY RECORDS LOADED ---\n")
 if not transaction_history:
-    print("(No previous database records found - starting fresh)")
+    print("No previous database records found")
 else:
     for order in transaction_history:
-        print(f"ID: {order[0]} | Product: {order[1]} | Quantity: {order[2]}")
-print(f"Current Total Base Inventory Units: {inventory}")
+        print(f"ID: {order[0]}, Product: {order[1]}, Quantity: {order[2]}")
 print("==========================================\n")
 
 while True:

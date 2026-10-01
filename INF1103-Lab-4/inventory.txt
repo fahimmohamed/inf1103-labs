@@ -1,3 +1,5 @@
-6
+9
 1001, Laptop, 4
 1002, TV, 2
+1003, Laptop stand, 1
+1004, Mouse, 2
