@@ -1,6 +1,5 @@
 import os
 
-# Initialize Inventory
 inventory = 0
 stock_value = 0
 failed_entries = 0
@@ -8,12 +7,9 @@ deliveries_processed = 0
 total_tax = 0.0
 user_input = ""
 product_name = ""
-filename = "inventory.txt"
-
-transaction_history = [] 
+transaction_history = []
 next_id = 1001
 
-# Find the exact folder path where this script file lives
 script_directory = os.path.dirname(os.path.abspath(__file__))
 filename = os.path.join(script_directory, "inventory.txt")
 
@@ -21,16 +17,19 @@ filename = os.path.join(script_directory, "inventory.txt")
 # Loads inventory upon start up
 def load_inventory():
     if not os.path.exists(filename):
-        print("Inventory does not exist")
+        print("Inventory does not exist. Creating new inventory.")
         return 0, [], 1001 
     else:
         print("Inventory exists!")
 
     with open(filename, "r") as file:
-        lines = file.read().splitlines()
+        raw_lines = file.read().splitlines()
+        
+    # Filter out any completely empty lines or lines containing only spaces right away
+    lines = [line for line in raw_lines if line.strip()]
 
     if not lines:
-        print("Inventory is empty")
+        print("Inventory is empty!")
         return 0, [], 1001
     else:
         print("Inventory is not empty!")
@@ -47,7 +46,6 @@ def load_inventory():
                 item_name = parts[1].strip()
                 item_qty = int(parts[2].strip())
                 
-                # Append the list row to our master history list
                 inventory_history.append([item_id, item_name, item_qty])
                 
                 if item_id >= current_next_id:
@@ -59,6 +57,7 @@ def load_inventory():
 # Save inventory
 def save_inventory(total_units, history_list):
     with open(filename, "w") as file:
+
         file.write(f"{total_units}\n")
         for order in history_list:
             file.write(f"{order[0]}, {order[1]}, {order[2]}\n")
@@ -66,7 +65,7 @@ def save_inventory(total_units, history_list):
     print("Any changes to inventory.txt have been saved.")
 
     
-# Handles prompt
+# Input verification
 def get_valid_input(product_name, current_id):
     while True:
         user_input = input("Enter the Stock Quantity or type 'quit': ").strip()
@@ -85,7 +84,7 @@ def get_valid_input(product_name, current_id):
             return "invalid"
 
         print(f"\nNew Order added: \n{current_id}, {product_name}, {stock_value}")
-        print(f"Orders added to inventory successfully!\n")
+        print(f"Orders added to {filename} successfully!\n")
         return stock_value
 
 
@@ -106,14 +105,16 @@ def generate_report(total_units, total_deliveries, failed_attempts, delivery_tax
     print(f"Total deliveries processed: {total_deliveries}")
     print(f"Number of Failed Entries: {failed_attempts}")
     print(f"Total tax: {delivery_tax:.2f}")
-    print(f"Transaction History:")
+    print("Transaction History:")
     for order in history_list:
-        print(f"{order[0]}, {order[1]}, {order[2]}")
+        print(f"  ID: {order[0]} | Product: {order[1]} | Quantity: {order[2]}")
     return
 
 
 
-# Main loop
+# Main
+
+#Load everything from the storage text file at start-up
 inventory, transaction_history, next_id = load_inventory()
 
 deliveries_processed = len(transaction_history)
@@ -122,13 +123,14 @@ total_tax = 0.0
 for order in transaction_history:
     total_tax += calculate_tax(order[2])
 
-print("Current record: \n")
+print("--- ALL CURRENT INVENTORY RECORDS LOADED ---\n")
 if not transaction_history:
     print("(No previous database records found - starting fresh)")
 else:
     for order in transaction_history:
         print(f"ID: {order[0]} | Product: {order[1]} | Quantity: {order[2]}")
-    print("\n")
+print(f"Current Total Base Inventory Units: {inventory}")
+print("==========================================\n")
 
 while True:
     product_name = input("Enter the Product Name: ").strip()
@@ -147,14 +149,14 @@ while True:
         continue
 
     stock_value = result
+
     transaction_history.append([next_id, product_name, stock_value])
-    inventory = process_delivery(inventory, stock_value)
     
-    # Calculate the tax for this delivery
+    inventory = process_delivery(inventory, stock_value)
     delivery_tax = calculate_tax(stock_value)
     total_tax += delivery_tax
-    
     deliveries_processed += 1
+    
     next_id += 1
 
 save_inventory(inventory, transaction_history)
