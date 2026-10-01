@@ -1,5 +1,8 @@
-9
+32
 1001, Laptop, 4
 1002, TV, 2
 1003, Laptop stand, 1
 1004, Mouse, 2
+1005, Keyboard, 1
+1006, USB Cable, 1
+1007, Fan, 21
