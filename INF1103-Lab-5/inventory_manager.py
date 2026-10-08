@@ -81,7 +81,8 @@ def calculate_tax():
     return
 
 def generate_report():
-    total_stock = sum(product["current_stock]"] for product in inventory)
+    global inventory
+    total_stock = sum(product["current_stock"] for product in inventory)
     print(f'''
 ========================================
             INVENTORY REPORT
@@ -123,14 +124,14 @@ def find_by_id(product_id):
     return None
 
 def update_stock():
-    global invalid_input_count
+    global invalid_input_counter
  
     print("Update Stock")
     product = find_by_id(input("Enter Product ID: ").strip())
  
     if not product:
         print("Product not found.")
-        invalid_input_count += 1
+        invalid_input_counter += 1
         return
  
     print("Product Found \n---------------------------")
@@ -156,14 +157,14 @@ def update_stock():
     print("Product updated successfully!")
 
 def search_product():
-    global invalid_input_count
+    global invalid_input_counter
  
     print("Search Product")
     product = find_by_id(input("Enter Product ID: ").strip())
  
     if not product:
         print("Product not found.")
-        invalid_input_count += 1
+        invalid_input_counter += 1
         return
  
     print("Product Found")
@@ -199,7 +200,7 @@ while True:
 ----------- MENU -----------
 1. Display All Products
 2. Add Product
-3. Update Stock
+3. Update Stock or Price
 4. Search Product
 5. Save Inventory
 6. Exit
@@ -226,6 +227,8 @@ while True:
 
         case "6":
             print("Saving inventory before exit...")
+            save_inventory(show_filename=False)
+            generate_report()
             break
 
         case _:

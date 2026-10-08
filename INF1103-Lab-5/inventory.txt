@@ -1,5 +1,47 @@
 [
-    {"product_id": "P001", "product_name": "Laptop", "product_price": 1200.00, "current_stock": 15, "transactions": [15]},
-    {"product_id": "P002", "product_name": "Mouse", "product_price": 25.50, "current_stock": 40, "transactions": [40]},
-    {"product_id": "P003", "product_name": "Keyboard", "product_price": 45.00, "current_stock": 25, "transactions": [25]}
+    {
+        "product_id": "P001",
+        "product_name": "Laptop",
+        "product_price": 1200.0,
+        "current_stock": 15,
+        "transactions": [
+            15
+        ]
+    },
+    {
+        "product_id": "P002",
+        "product_name": "Mouse",
+        "product_price": 25.5,
+        "current_stock": 40,
+        "transactions": [
+            40
+        ]
+    },
+    {
+        "product_id": "P003",
+        "product_name": "Keyboard",
+        "product_price": 45.0,
+        "current_stock": 25,
+        "transactions": [
+            25
+        ]
+    },
+    {
+        "product_id": "P004",
+        "product_name": "USB Cable",
+        "product_price": 10.0,
+        "current_stock": 5,
+        "transactions": [
+            5
+        ]
+    },
+    {
+        "product_id": "P005",
+        "product_name": "Fish Tank",
+        "product_price": 50.0,
+        "current_stock": 2,
+        "transactions": [
+            2
+        ]
+    }
 ]
