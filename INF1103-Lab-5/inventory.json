@@ -81,5 +81,15 @@
         "transactions": [
             5
         ]
+    },
+    {
+        "product_id": "P008",
+        "product_name": "Monitor",
+        "product_price": 299.99,
+        "current_stock": 9,
+        "transactions": [
+            10,
+            -1
+        ]
     }
 ]

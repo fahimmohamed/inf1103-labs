@@ -1,6 +1,8 @@
 import os
 import json
 
+
+
 invalid_input_counter = 0
 
 inventory = []
@@ -8,6 +10,9 @@ new_products = []
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 filename = os.path.join(script_directory, "inventory.json")
+
+print("Current Working Directory:", os.getcwd())
+print("Inventory File:", filename)
 
 # ==================================================
 #               File related functions
