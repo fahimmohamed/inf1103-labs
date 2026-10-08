@@ -52,7 +52,7 @@ def get_valid_input(prompt, cast):
         try:
             value = cast(input(prompt.strip()))
         except ValueError:
-            print("Invalid input, please enter only numbers")
+            print("Invalid input, please enter only numbers and decimal point '.'")
             invalid_input_counter += 1
             continue
         
@@ -79,19 +79,19 @@ Invalid inputs entered: {invalid_input_counter}
     return
 
 def add_product():
-
+    global invalid_input_counter
     print("Add New Product")
     print("------------------------------------------------")
     product_id = input("Product ID: ").strip().upper()
  
     if not product_id:
         print("Product ID cannot be empty.")
-        invalid_input_count += 1
+        invalid_input_counter += 1
         return
  
     if find_by_id(product_id):
         print(f"Product {product_id} already exists.")
-        invalid_input_count += 1
+        invalid_input_counter += 1
         return
  
     product_name = input("Product Name: ").strip()
@@ -115,6 +115,7 @@ def search_product():
     return
 
 def current_inventory():
+    global inventory
     print("Current Inventory")
     print("------------------------------------------------")
     for product in inventory:
@@ -129,6 +130,8 @@ print('''
 ========================================
 INVENTORY MANAGEMENT SYSTEM
 ========================================''')
+
+load_inventory() # Loads the inventory upon start up
 
 while True:
     print("""
