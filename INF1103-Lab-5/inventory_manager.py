@@ -4,6 +4,7 @@ import json
 invalid_input_counter = 0
 
 inventory = []
+new_products = []
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 filename = os.path.join(script_directory, "inventory.txt")
@@ -78,16 +79,25 @@ def get_valid_input(prompt, cast, default=None):
         return value
 
 def calculate_tax():
-    return
+    total_tax = 0
+
+    for product in new_products:
+        total_tax += product["product_price"] * 0.10
+
+    return total_tax
 
 def generate_report():
     global inventory
+
+    total_stock = sum(product["current_stock"] for product in inventory)
+    total_tax = calculate_tax()
     total_stock = sum(product["current_stock"] for product in inventory)
     print(f'''
 ========================================
             INVENTORY REPORT
 Total products: {len(inventory)}
 Total units in stock: {total_stock}
+Total Tax on new products: ${total_tax:.2f}
 Invalid inputs entered: {invalid_input_counter}
 ========================================
 ''')
@@ -113,7 +123,10 @@ def add_product():
     product_price = get_valid_input("Price: ", float)
     current_stock = get_valid_input("Stock Quantity: ", int)
  
-    inventory.append({"product_id": product_id, "product_name": product_name, "product_price": product_price, "current_stock": current_stock, "transactions": [current_stock]})
+    product = {"product_id": product_id, "product_name": product_name, "product_price": product_price, "current_stock": current_stock, "transactions": [current_stock]}
+
+    inventory.append(product)
+    new_products.append(product)
     print("\n***** Product added successfully! *****")
     return
 

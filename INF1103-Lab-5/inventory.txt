@@ -43,5 +43,14 @@
         "transactions": [
             2
         ]
+    },
+    {
+        "product_id": "P006",
+        "product_name": "Phone Stand",
+        "product_price": 2.0,
+        "current_stock": 2,
+        "transactions": [
+            2
+        ]
     }
 ]
