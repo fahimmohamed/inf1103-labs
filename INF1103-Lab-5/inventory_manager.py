@@ -7,7 +7,7 @@ inventory = []
 new_products = []
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
-filename = os.path.join(script_directory, "inventory.txt")
+filename = os.path.join(script_directory, "inventory.json")
 
 # ==================================================
 #               File related functions
@@ -20,7 +20,7 @@ def load_inventory():
         with open(filename, "r") as file:
             is_content = file.read()
 
-        print("inventory.txt found")
+        print("inventory.json found")
 
         if not is_content.strip():
             raise ValueError("File is empty")
@@ -54,7 +54,7 @@ def save_inventory(show_filename=True):
         json.dump(inventory, file, indent=4)
  
     if show_filename:
-        print("Inventory saved successfully to inventory.txt.")
+        print("Inventory saved successfully to inventory.json.")
     else:
         print("Inventory saved successfully.")
     return
