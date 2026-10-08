@@ -9,6 +9,10 @@ new_products = []
 script_directory = os.path.dirname(os.path.abspath(__file__))
 filename = os.path.join(script_directory, "inventory.txt")
 
+# ==================================================
+#               File related functions
+# ==================================================
+
 def load_inventory():
     global inventory
 
@@ -55,6 +59,23 @@ def save_inventory(show_filename=True):
         print("Inventory saved successfully.")
     return
 
+def current_inventory():
+    global inventory
+    if not inventory:
+        print("No products found.")
+        return
+    print("Current Inventory")
+    print("------------------------------------------------")
+    for product in inventory:
+        print(f"ID: {product['product_id']} | Name: {product['product_name']} | Price: {product['product_price']:.2f} | Stock: {product['current_stock']}")
+    print("------------------------------------------------")
+    return
+
+
+# ==================================================
+#               Input Validation functions
+# ==================================================
+
 def get_valid_input(prompt, cast, default=None):
     global invalid_input_counter
  
@@ -78,18 +99,21 @@ def get_valid_input(prompt, cast, default=None):
  
         return value
 
+# ==================================================
+#               Report Generation functions
+# ==================================================
+
 def calculate_tax():
     total_tax = 0
 
     for product in new_products:
-        total_tax += product["product_price"] * 0.10
+        total_tax += product["product_price"] * product["current_stock"] * 0.10
 
     return total_tax
 
 def generate_report():
     global inventory
 
-    total_stock = sum(product["current_stock"] for product in inventory)
     total_tax = calculate_tax()
     total_stock = sum(product["current_stock"] for product in inventory)
     print(f'''
@@ -102,6 +126,10 @@ Invalid inputs entered: {invalid_input_counter}
 ========================================
 ''')
     return
+
+# ==================================================
+#               Product related functions
+# ==================================================
 
 def add_product():
     global invalid_input_counter
@@ -120,6 +148,25 @@ def add_product():
         return
  
     product_name = input("Product Name: ").strip()
+    while not product_name:
+        print("Product Name cannot be empty.")
+        invalid_input_counter += 1
+        product_name = input("Product Name: ").strip()
+
+    existing_product = find_by_name(product_name)
+    if existing_product:
+        print(f"\nA product named '{product_name}' already exists (ID: {existing_product['product_id']}).")
+        choice = input("Would you like to update its stock/price instead? (y/n): ").strip().lower()
+        
+        if choice in ['y', 'yes']:
+            print()
+            # Redirect directly to update_stock logic using the found product
+            update_stock(existing_product)
+            return
+        else:
+            print("Product addition cancelled.")
+            return
+
     product_price = get_valid_input("Price: ", float)
     current_stock = get_valid_input("Stock Quantity: ", int)
  
@@ -130,17 +177,26 @@ def add_product():
     print("\n***** Product added successfully! *****")
     return
 
+def find_by_name(product_name):
+    for product in inventory:
+        if product["product_name"].lower() == product_name.lower():
+            return product
+    return None
+
 def find_by_id(product_id):
     for product in inventory:
         if product["product_id"].lower() == product_id.lower():
             return product
     return None
 
-def update_stock():
+def update_stock(product=None):
     global invalid_input_counter
  
     print("Update Stock")
-    product = find_by_id(input("Enter Product ID: ").strip())
+    if product is None:
+        product = find_by_id(
+            input("Enter Product ID: ").strip().upper()
+        )
  
     if not product:
         print("Product not found.")
@@ -167,13 +223,16 @@ def update_stock():
  
     product["current_stock"] = new_stock
     product["product_price"] = new_price
+    if product not in new_products:
+        new_products.append(product)
+
     print("Product updated successfully!")
 
 def search_product():
     global invalid_input_counter
  
     print("Search Product")
-    product = find_by_id(input("Enter Product ID: ").strip())
+    product = find_by_id(input("Enter Product ID: ").strip().upper())
  
     if not product:
         print("Product not found.")
@@ -189,17 +248,12 @@ def search_product():
     print("-" * 48)
     return
 
-def current_inventory():
-    global inventory
-    print("Current Inventory")
-    print("------------------------------------------------")
-    for product in inventory:
-        print(f"ID: {product['product_id']} | Name: {product['product_name']} | Price: {product['product_price']:.2f} | Stock: {product['current_stock']}")
-    print("------------------------------------------------")
-    return
 
 
-# Main Loop
+
+# ==================================================
+#               Main Loop
+# ==================================================
 
 print('''
 ========================================

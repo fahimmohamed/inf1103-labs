@@ -52,5 +52,34 @@
         "transactions": [
             2
         ]
+    },
+    {
+        "product_id": "P007",
+        "product_name": "TV",
+        "product_price": 2500.0,
+        "current_stock": 5,
+        "transactions": [
+            3,
+            2
+        ]
+    },
+    {
+        "product_id": "W001",
+        "product_name": "Wallet",
+        "product_price": 51.0,
+        "current_stock": 2,
+        "transactions": [
+            1,
+            1
+        ]
+    },
+    {
+        "product_id": "W002",
+        "product_name": "Handbag",
+        "product_price": 20.0,
+        "current_stock": 5,
+        "transactions": [
+            5
+        ]
     }
 ]
