@@ -43,24 +43,38 @@ def initialize_file():
     with open(filename, "w") as file:
         file.write("[]")
 
-def save_inventory():
+def save_inventory(show_filename=True):
+
+    with open(filename, "w") as file:
+        json.dump(inventory, file, indent=4)
+ 
+    if show_filename:
+        print("Inventory saved successfully to inventory.txt.")
+    else:
+        print("Inventory saved successfully.")
     return
 
-def get_valid_input(prompt, cast):
+def get_valid_input(prompt, cast, default=None):
     global invalid_input_counter
+ 
     while True:
+        user_input = input(prompt).strip()
+ 
+        if default is not None and user_input == "":
+            return default  # Enter keeps the current value
+ 
         try:
-            value = cast(input(prompt.strip()))
+            value = cast(user_input)
         except ValueError:
-            print("Invalid input, please enter only numbers and decimal point '.'")
+            print("Invalid input, please try again.")
             invalid_input_counter += 1
             continue
-        
+ 
         if value < 0:
-            print("Input cannot be negative, please enter only numbers")
+            print("Value cannot be negative.")
             invalid_input_counter += 1
-            continue            
-
+            continue
+ 
         return value
 
 def calculate_tax():
@@ -109,9 +123,56 @@ def find_by_id(product_id):
     return None
 
 def update_stock():
-    return
+    global invalid_input_count
+ 
+    print("Update Stock")
+    product = find_by_id(input("Enter Product ID: ").strip())
+ 
+    if not product:
+        print("Product not found.")
+        invalid_input_count += 1
+        return
+ 
+    print("Product Found \n---------------------------")
+    print(f"Name: {product['product_name']}")
+    print(f"Current Stock: {product['current_stock']}")
+    print(f"Current Price: ${product['product_price']:.2f}")
+    print("(Press Enter to keep a current value)")
+ 
+    new_stock = get_valid_input("New Stock Quantity: ", int, product["current_stock"])
+    new_price = get_valid_input("New Price: ", float, product["product_price"])
+ 
+    stock_change = new_stock - product["current_stock"]
+ 
+    if stock_change == 0 and new_price == product["product_price"]:
+        print("No changes made.")
+        return
+ 
+    if stock_change != 0:
+        product["transactions"].append(stock_change)  # keep the history, not just the total
+ 
+    product["current_stock"] = new_stock
+    product["product_price"] = new_price
+    print("Product updated successfully!")
 
 def search_product():
+    global invalid_input_count
+ 
+    print("Search Product")
+    product = find_by_id(input("Enter Product ID: ").strip())
+ 
+    if not product:
+        print("Product not found.")
+        invalid_input_count += 1
+        return
+ 
+    print("Product Found")
+    print("-" * 48)
+    print(f"ID: {product['product_id']}")
+    print(f"Name: {product['product_name']}")
+    print(f"Price: ${product['product_price']:.2f}")
+    print(f"Stock: {product['current_stock']}")
+    print("-" * 48)
     return
 
 def current_inventory():
