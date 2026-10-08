@@ -1,0 +1,5 @@
+[
+    {"product_id": "P001", "product_name": "Laptop", "product_price": 1200.00, "current_stock": 15, "transactions": [15]},
+    {"product_id": "P002", "product_name": "Mouse", "product_price": 25.50, "current_stock": 40, "transactions": [40]},
+    {"product_id": "P003", "product_name": "Keyboard", "product_price": 45.00, "current_stock": 25, "transactions": [25]}
+]
