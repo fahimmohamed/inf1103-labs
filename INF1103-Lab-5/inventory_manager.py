@@ -3,49 +3,63 @@ import json
 
 invalid_input_counter = 0
 
-inventory = [
-    {"product_id": "P001", "product_name": "Laptop", "product_price": 1200.00,
-     "current_stock": 15, "transactions": [15]},
-    {"product_id": "P002", "product_name": "Mouse", "product_price": 25.50,
-     "current_stock": 40, "transactions": [40]},
-    {"product_id": "P003", "product_name": "Keyboard", "product_price": 45.00,
-     "current_stock": 25, "transactions": [25]},
-]
+inventory = []
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 filename = os.path.join(script_directory, "inventory.txt")
 
 def load_inventory():
+    global inventory
+
     try:
         with open(filename, "r") as file:
             is_content = file.read()
 
-            if not is_content.strip():
-                raise ValueError("File is empty")
+        print("inventory.txt found")
 
-            inventory = json.loads(is_content)
+        if not is_content.strip():
+            raise ValueError("File is empty")
+
+        inventory = json.loads(is_content)
+
+        if not isinstance(inventory, list):
+            raise ValueError("JSON is not a list of products")
+ 
+        print("Inventory loaded successfully.")
 
     except FileNotFoundError:
         print(f"{filename} does not exist. Creating now...")
+        initialize_file()
 
     except (ValueError, json.JSONDecodeError):
         print(f"{filename} exists but has no data.")
-    return
+        print("Initializing it now...")
+        initialize_file()
+
+def initialize_file():
+    global inventory
+    inventory = []
+ 
+    with open(filename, "w") as file:
+        file.write("[]")
 
 def save_inventory():
     return
 
 def get_valid_input(prompt, cast):
+    global invalid_input_counter
     while True:
         try:
             value = cast(input(prompt.strip()))
         except ValueError:
-            print("Invalid input, please enter only numbers 1-6")
+            print("Invalid input, please enter only numbers")
             invalid_input_counter += 1
             continue
         
-        if value < 1:
-            print("Input cannot be 0 or negative, please enter only numbers 1-6")
+        if value < 0:
+            print("Input cannot be negative, please enter only numbers")
+            invalid_input_counter += 1
+            continue            
 
         return value
 
@@ -65,6 +79,7 @@ Invalid inputs entered: {invalid_input_counter}
     return
 
 def add_product():
+
     print("Add New Product")
     print("------------------------------------------------")
     product_id = input("Product ID: ").strip().upper()
@@ -150,6 +165,7 @@ while True:
             break
 
         case _:
+            invalid_input_counter += 1
             print("***** Please enter a valid option from 1-6 *****")
             print("*****    No Alphabets or symbols please    *****")
 
@@ -158,4 +174,3 @@ print("""
 Thank you for using Inventory Management System.
 Program terminated.
 """)
-
