@@ -312,4 +312,4 @@ while True:
 print("""
 Thank you for using Inventory Management System.
 Program terminated.
-""")
+""")    
