@@ -101,5 +101,15 @@
         "transactions": [
             10
         ]
+    },
+    {
+        "product_id": "P010",
+        "product_name": "whiteboard",
+        "product_price": 5.0,
+        "current_stock": 6,
+        "transactions": [
+            3,
+            3
+        ]
     }
 ]
