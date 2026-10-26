@@ -39,8 +39,9 @@
         "product_id": "P005",
         "product_name": "Fish Tank",
         "product_price": 50.0,
-        "current_stock": 2,
+        "current_stock": 4,
         "transactions": [
+            2,
             2
         ]
     },
@@ -90,6 +91,15 @@
         "transactions": [
             10,
             -1
+        ]
+    },
+    {
+        "product_id": "P009",
+        "product_name": "Macbook",
+        "product_price": 1890.0,
+        "current_stock": 10,
+        "transactions": [
+            10
         ]
     }
 ]

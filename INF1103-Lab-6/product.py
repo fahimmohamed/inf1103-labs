@@ -45,7 +45,67 @@ class Product:
         return stock
 
     
+    # ---------- getters (read-only access) ----------
 
+    def get_product_id(self):
+        return self.__product_id
 
-product1 = Product("P001", "Keyboard", 45.90, 10)
-print(product1)
+    def get_name(self):
+        return self.__name
+
+    def get_price(self):
+        return self.__price
+
+    def get_stock(self):
+        return self.__stock
+
+    def get_transactions(self):
+        return list(self.__transactions)  # a copy, so outside code cannot change the history
+
+    def get_value(self):
+        return self.__price * self.__stock
+
+    # ---------- methods that change state ----------
+
+    def update_stock(self, quantity):
+        """Set the stock to `quantity` and record the difference as a transaction."""
+        quantity = self.__valid_stock(quantity)
+        change = quantity - self.__stock
+
+        if change != 0:
+            self.__transactions.append(change)
+
+        self.__stock = quantity
+        return change
+
+    def set_price(self, price):
+        self.__price = self.__valid_price(price)
+
+    # ---------- display / conversion ----------
+
+    def display_information(self, detailed=False):
+        if detailed:
+            print(f"ID: {self.__product_id}")
+            print(f"Name: {self.__name}")
+            print(f"Price: ${self.__price:.2f}")
+            print(f"Stock: {self.__stock}")
+        else:
+            print(f"ID: {self.__product_id} | Name: {self.__name} | "
+                  f"Price: ${self.__price:.2f} | Stock: {self.__stock}")
+
+    def to_dict(self):
+        return {
+            "product_id": self.__product_id,
+            "product_name": self.__name,
+            "product_price": self.__price,
+            "current_stock": self.__stock,
+            "transactions": list(self.__transactions),
+        }
+
+    @staticmethod
+    def from_dict(data):
+        return Product(data["product_id"], data["product_name"], data["product_price"],
+                       data["current_stock"], data["transactions"])
+
+# product1 = Product("P001", "Keyboard", 45.90, 10)
+# print(product1)
