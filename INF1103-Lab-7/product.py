@@ -1,13 +1,8 @@
 import math
 
+
 class Product:
-    # def __init__(self, product_id, product_name, product_price, current_stock):
-    #     self.__product_id = product_id.strip()
-    #     self.__product_name = product_name
-    #     self.__product_price = product_price
-    #     self.current_stock = current_stock
-    #     self.transactions = [current_stock]
-    #     pass
+    """Represents and manages ONE product (single responsibility)."""
 
     def __init__(self, product_id, name, price, stock, transactions=None):
         if not isinstance(product_id, str) or not product_id.strip() or len(product_id.split()) > 1:
@@ -30,12 +25,17 @@ class Product:
 
     # ---------- private validation ----------
 
+    @staticmethod
+    def _check_number(value, label):
+        """Protected helper: subclasses reuse it to validate their own numbers."""
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError(f"{label} must be a number.")
+        if not math.isfinite(value) or value < 0:
+            raise ValueError(f"{label} must be a non-negative number.")
+        return float(value) + 0  # + 0 turns -0.0 into 0.0
+
     def __valid_price(self, price):
-        if isinstance(price, bool) or not isinstance(price, (int, float)):
-            raise ValueError("Price must be a number.")
-        if not math.isfinite(price) or price < 0:
-            raise ValueError("Price must be a non-negative number.")
-        return round(float(price), 2) + 0  # + 0 turns -0.0 into 0.0
+        return round(self._check_number(price, "Price"), 2)
 
     def __valid_stock(self, stock):
         if isinstance(stock, bool) or not isinstance(stock, int):
@@ -44,7 +44,6 @@ class Product:
             raise ValueError("Stock cannot be negative.")
         return stock
 
-    
     # ---------- getters (read-only access) ----------
 
     def get_product_id(self):
@@ -107,5 +106,40 @@ class Product:
         return Product(data["product_id"], data["product_name"], data["product_price"],
                        data["current_stock"], data["transactions"])
 
-# product1 = Product("P001", "Keyboard", 45.90, 10)
-# print(product1)
+
+class PhysicalProduct(Product):
+    """A product that is stored and shipped. A PhysicalProduct IS-A Product."""
+
+    def __init__(self, product_id, name, price, stock, weight, transactions=None):
+        super().__init__(product_id, name, price, stock, transactions)  # reuse Product's constructor
+        self.__weight = self._check_number(weight, "Weight")
+
+    def get_weight(self):
+        return self.__weight
+
+    def display_information(self, detailed=False):
+        super().display_information(detailed)  # common information comes from Product
+        if detailed:
+            print("Type: Physical")
+            print(f"Weight: {self.__weight:.2f} kg")
+        else:
+            print(f"    Type: Physical | Weight: {self.__weight:.2f} kg")
+
+
+class DigitalProduct(Product):
+    """A product delivered by download. A DigitalProduct IS-A Product."""
+
+    def __init__(self, product_id, name, price, stock, download_size, transactions=None):
+        super().__init__(product_id, name, price, stock, transactions)  # reuse Product's constructor
+        self.__download_size = self._check_number(download_size, "Download size")
+
+    def get_download_size(self):
+        return self.__download_size
+
+    def display_information(self, detailed=False):
+        super().display_information(detailed)  # common information comes from Product
+        if detailed:
+            print("Type: Digital")
+            print(f"Download size: {self.__download_size:.2f} MB")
+        else:
+            print(f"    Type: Digital | Download size: {self.__download_size:.2f} MB")
