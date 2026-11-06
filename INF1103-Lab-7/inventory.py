@@ -3,7 +3,7 @@ class Inventory:
         self.__products = []
 
     #Add a product. Returns False (and adds nothing) if the ID already exists.
-    def add_products(self, product):
+    def add_product(self, product):
 
         if self.search_product(product.get_product_id()) is not None:
             return False

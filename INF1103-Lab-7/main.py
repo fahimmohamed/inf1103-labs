@@ -53,7 +53,7 @@ def load_inventory(inventory):
                 raise ValueError("Duplicate product ID")
 
         for product in loaded_inventory.get_products():
-            inventory.add_products(product)
+            inventory.add_product(product)
 
         print("Inventory loaded successfully.")
 
@@ -197,7 +197,7 @@ def add_products():
     else:
         download_size = get_valid_input("Download Size (MB): ", float)
         product = DigitalProduct(product_id, name, price, stock, download_size)
-    inventory.add_products(product)
+    inventory.add_product(product)
     new_products.append(product)  # remembered for this session's tax calculation
     print("\n***** Product added successfully! *****")
 
