@@ -1,7 +1,15 @@
 import math
+from abc import ABC, abstractmethod
 
+class CanBeShipped(ABC):
+    """Interface-style contract: anything that can be shipped must calculate its shipping cost."""
 
-class Product:
+    @abstractmethod
+    def calculate_shipping_cost(self):
+        """Return the cost of shipping this item."""
+        pass
+
+class Product(ABC):
     """Represents and manages ONE product (single responsibility)."""
 
     def __init__(self, product_id, name, price, stock, transactions=None):
@@ -101,14 +109,19 @@ class Product:
             "transactions": list(self.__transactions),
         }
 
-    @staticmethod
-    def from_dict(data):
-        return Product(data["product_id"], data["product_name"], data["product_price"],
-                       data["current_stock"], data["transactions"])
+    # ---------- every subclass MUST implement this ----------
+
+    @abstractmethod
+    def get_fulfilment_info(self):
+        """Return text describing how this product is fulfilled."""
+        pass    
 
 
-class PhysicalProduct(Product):
+class PhysicalProduct(Product, CanBeShipped):
     """A product that is stored and shipped. A PhysicalProduct IS-A Product."""
+
+    BASE_SHIPPING_COST = 5.00  # flat fee
+    COST_PER_KG = 2.00         # plus this amount for every kilogram
 
     def __init__(self, product_id, name, price, stock, weight, transactions=None):
         super().__init__(product_id, name, price, stock, transactions)  # reuse Product's constructor
@@ -117,11 +130,19 @@ class PhysicalProduct(Product):
     def get_weight(self):
         return self.__weight
 
+    def get_fulfilment_info(self):
+        return "Requires physical shipping."
+
+    def calculate_shipping_cost(self):
+        return round(self.BASE_SHIPPING_COST + self.COST_PER_KG * self.__weight, 2)
+
     def display_information(self, detailed=False):
         super().display_information(detailed)  # common information comes from Product
         if detailed:
             print("Type: Physical")
             print(f"Weight: {self.__weight:.2f} kg")
+            print(f"Fulfilment: {self.get_fulfilment_info()}")
+            print(f"Shipping cost: ${self.calculate_shipping_cost():.2f}")
         else:
             print(f"    Type: Physical | Weight: {self.__weight:.2f} kg")
 
@@ -147,11 +168,15 @@ class DigitalProduct(Product):
     def get_download_size(self):
         return self.__download_size
 
+    def get_fulfilment_info(self):
+        return "Delivered digitally by download."
+
     def display_information(self, detailed=False):
         super().display_information(detailed)  # common information comes from Product
         if detailed:
             print("Type: Digital")
             print(f"Download size: {self.__download_size:.2f} MB")
+            print(f"Fulfilment: {self.get_fulfilment_info()}")
         else:
             print(f"    Type: Digital | Download size: {self.__download_size:.2f} MB")
 
