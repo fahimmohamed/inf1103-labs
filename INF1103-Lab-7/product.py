@@ -125,6 +125,17 @@ class PhysicalProduct(Product):
         else:
             print(f"    Type: Physical | Weight: {self.__weight:.2f} kg")
 
+    def to_dict(self):
+        data = super().to_dict()  # common fields come from Product
+        data["type"] = "physical"
+        data["weight"] = self.__weight
+        return data
+
+    @staticmethod
+    def from_dict(data):
+        return PhysicalProduct(data["product_id"], data["product_name"], data["product_price"],
+                               data["current_stock"], data["weight"], data["transactions"])
+
 
 class DigitalProduct(Product):
     """A product delivered by download. A DigitalProduct IS-A Product."""
@@ -143,3 +154,13 @@ class DigitalProduct(Product):
             print(f"Download size: {self.__download_size:.2f} MB")
         else:
             print(f"    Type: Digital | Download size: {self.__download_size:.2f} MB")
+
+    def to_dict(self):
+        data = super().to_dict()  # common fields come from Product
+        data["type"] = "digital"
+        data["download_size"] = self.__download_size
+        return data
+
+    @staticmethod
+    def from_dict(data):
+        return DigitalProduct(data["product_id"], data["product_name"], data["product_price"], data["current_stock"], data["download_size"], data["transactions"])

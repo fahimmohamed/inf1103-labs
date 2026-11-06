@@ -2,7 +2,7 @@ import os
 import json
 import math
 
-from product import Product
+from product import Product, PhysicalProduct, DigitalProduct
 from inventory import Inventory
 
 invalid_input_counter = 0
@@ -11,13 +11,24 @@ tax_rate = 0.10
 inventory = Inventory()
 new_products = []  # Product objects added this session (used for the tax calculation)
 
+# the "type" saved in the JSON file decides which class is created when loading
+product_types = {
+    "physical": PhysicalProduct,
+    "digital": DigitalProduct,
+}
+
 script_directory = os.path.dirname(os.path.abspath(__file__))
 filename = os.path.join(script_directory, "inventory.json")
+
+
 
 
 # ==================================================
 #               File handling
 # ==================================================
+
+def create_product_from_dict(data):
+    return product_types[data["type"]].from_dict(data)  # KeyError if the type is missing/unknown
 
 def load_inventory(inventory):
     try:
@@ -38,7 +49,7 @@ def load_inventory(inventory):
         loaded_inventory = Inventory()  # filled first, so a bad file never half-loads
 
         for product_data in data:
-            if not loaded_inventory.add_products(Product.from_dict(product_data)):
+             if not loaded_inventory.add_product(create_product_from_dict(product_data)):
                 raise ValueError("Duplicate product ID")
 
         for product in loaded_inventory.get_products():
@@ -129,6 +140,23 @@ def calculate_tax(amount):
 #               Menu options
 # ==================================================
 
+def choose_product_type():
+    global invalid_input_counter
+
+    while True:
+        print("Product Type:")
+        print("1. Physical")
+        print("2. Digital")
+        choice = input("Choose type (1-2): ").strip()
+
+        if choice == "1":
+            return "physical"
+        if choice == "2":
+            return "digital"
+
+        print("Please enter 1 or 2.")
+        invalid_input_counter += 1
+
 #Option 2
 def add_products():
     global invalid_input_counter
@@ -158,10 +186,17 @@ def add_products():
         invalid_input_counter += 1
         name = input("Product Name: ").strip()
 
+    product_type = choose_product_type()
+
     price = get_valid_input("Price: ", float)
     stock = get_valid_input("Stock Quantity: ", int)
 
-    product = Product(product_id, name, price, stock)
+    if product_type == "physical":
+        weight = get_valid_input("Weight (kg): ", float)
+        product = PhysicalProduct(product_id, name, price, stock, weight)
+    else:
+        download_size = get_valid_input("Download Size (MB): ", float)
+        product = DigitalProduct(product_id, name, price, stock, download_size)
     inventory.add_products(product)
     new_products.append(product)  # remembered for this session's tax calculation
     print("\n***** Product added successfully! *****")
