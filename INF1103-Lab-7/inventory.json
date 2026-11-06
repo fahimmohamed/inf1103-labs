@@ -43,5 +43,17 @@
         ],
         "type": "digital",
         "download_size": 380.6
+    },
+    {
+        "product_id": "P005",
+        "product_name": "Keyboard",
+        "product_price": 21.0,
+        "current_stock": 5,
+        "transactions": [
+            10,
+            -5
+        ],
+        "type": "physical",
+        "weight": 0.8
     }
 ]
