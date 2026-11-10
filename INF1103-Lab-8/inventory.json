@@ -55,5 +55,16 @@
         ],
         "type": "physical",
         "weight": 0.8
+    },
+    {
+        "product_id": "P006",
+        "product_name": "Monitor",
+        "product_price": 150.0,
+        "current_stock": 3,
+        "transactions": [
+            3
+        ],
+        "type": "physical",
+        "weight": 4.5
     }
 ]

@@ -2,7 +2,8 @@ import os
 import json
 import math
 
-from product import Product, PhysicalProduct, DigitalProduct
+from physical_product import PhysicalProduct
+from digital_product import DigitalProduct
 from inventory import Inventory
 
 invalid_input_counter = 0
