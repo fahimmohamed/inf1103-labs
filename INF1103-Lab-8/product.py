@@ -1,19 +1,25 @@
 import math
 from abc import ABC, abstractmethod
 
+from supplier import Supplier
+
+
 class Product(ABC):
     """Represents and manages ONE product (single responsibility)."""
 
-    def __init__(self, product_id, name, price, stock, transactions=None):
+    def __init__(self, product_id, name, price, stock, supplier: Supplier, transactions=None):
         if not isinstance(product_id, str) or not product_id.strip() or len(product_id.split()) > 1:
             raise ValueError("Product ID must be text without spaces.")
         if not isinstance(name, str) or not name.strip():
             raise ValueError("Product name cannot be empty.")
+        if not isinstance(supplier, Supplier):
+            raise ValueError("A product must have a Supplier object.")
 
         self.__product_id = product_id.strip()
         self.__name = name.strip()
         self.__price = self.__valid_price(price)
         self.__stock = self.__valid_stock(stock)
+        self.__supplier: Supplier = supplier  # a reference only: the Supplier is not part of the Product
 
         if transactions is None:
             self.__transactions = [self.__stock]  # starting stock is the first transaction
@@ -61,6 +67,9 @@ class Product(ABC):
     def get_transactions(self):
         return list(self.__transactions)  # a copy, so outside code cannot change the history
 
+    def get_supplier(self) -> Supplier:
+        return self.__supplier
+
     def get_value(self):
         return self.__price * self.__stock
 
@@ -88,6 +97,7 @@ class Product(ABC):
             print(f"Name: {self.__name}")
             print(f"Price: ${self.__price:.2f}")
             print(f"Stock: {self.__stock}")
+            self.__supplier.display_information()  # the Product asks its Supplier to display itself
         else:
             print(f"ID: {self.__product_id} | Name: {self.__name} | "
                   f"Price: ${self.__price:.2f} | Stock: {self.__stock}")
@@ -99,6 +109,7 @@ class Product(ABC):
             "product_price": self.__price,
             "current_stock": self.__stock,
             "transactions": list(self.__transactions),
+            "supplier": self.__supplier.to_dict(),
         }
 
     # ---------- every subclass MUST implement this ----------
@@ -106,4 +117,4 @@ class Product(ABC):
     @abstractmethod
     def get_fulfilment_info(self):
         """Return text describing how this product is fulfilled."""
-        pass    
+        pass

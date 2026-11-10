@@ -1,4 +1,5 @@
 from product import Product
+from supplier import Supplier
 from can_be_shipped import CanBeShipped
 
 
@@ -8,8 +9,8 @@ class PhysicalProduct(Product, CanBeShipped):
     BASE_SHIPPING_COST = 5.00  # flat fee
     COST_PER_KG = 2.00         # plus this amount for every kilogram
 
-    def __init__(self, product_id, name, price, stock, weight, transactions=None):
-        super().__init__(product_id, name, price, stock, transactions)  # reuse Product's constructor
+    def __init__(self, product_id, name, price, stock, supplier: Supplier, weight, transactions=None):
+        super().__init__(product_id, name, price, stock, supplier, transactions)  # reuse Product's constructor
         self.__weight = self._check_number(weight, "Weight")
 
     def get_weight(self):
@@ -38,6 +39,7 @@ class PhysicalProduct(Product, CanBeShipped):
         return data
 
     @staticmethod
-    def from_dict(data):
+    def from_dict(data, supplier: Supplier):
+        # the Supplier object is created (or reused) by the caller and passed in
         return PhysicalProduct(data["product_id"], data["product_name"], data["product_price"],
-                               data["current_stock"], data["weight"], data["transactions"])
+                               data["current_stock"], supplier, data["weight"], data["transactions"])

@@ -24,8 +24,19 @@ class Supplier:
     def get_contact_email(self) -> str:
         return self.__contact_email
 
-    # ---------- display ----------
+    # ---------- display / conversion ----------
 
     def display_information(self) -> None:
         print(f"Supplier ID: {self.__supplier_id} | Name: {self.__name} | "
               f"Email: {self.__contact_email}")
+
+    def to_dict(self) -> dict:
+        return {
+            "supplier_id": self.__supplier_id,
+            "supplier_name": self.__name,
+            "contact_email": self.__contact_email,
+        }
+
+    @staticmethod
+    def from_dict(data: dict) -> "Supplier":
+        return Supplier(data["supplier_id"], data["supplier_name"], data["contact_email"])

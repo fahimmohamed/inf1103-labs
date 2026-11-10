@@ -7,6 +7,11 @@
         "transactions": [
             15
         ],
+        "supplier": {
+            "supplier_id": "S001",
+            "supplier_name": "TechWorld Pte Ltd",
+            "contact_email": "sales@techworld.sg"
+        },
         "type": "physical",
         "weight": 2.2
     },
@@ -18,6 +23,11 @@
         "transactions": [
             40
         ],
+        "supplier": {
+            "supplier_id": "S001",
+            "supplier_name": "TechWorld Pte Ltd",
+            "contact_email": "sales@techworld.sg"
+        },
         "type": "physical",
         "weight": 0.1
     },
@@ -29,6 +39,11 @@
         "transactions": [
             100
         ],
+        "supplier": {
+            "supplier_id": "S002",
+            "supplier_name": "SoftSource Pte Ltd",
+            "contact_email": "orders@softsource.sg"
+        },
         "type": "digital",
         "download_size": 250.0
     },
@@ -41,6 +56,11 @@
             50,
             -30
         ],
+        "supplier": {
+            "supplier_id": "S002",
+            "supplier_name": "SoftSource Pte Ltd",
+            "contact_email": "orders@softsource.sg"
+        },
         "type": "digital",
         "download_size": 380.6
     },
@@ -53,18 +73,12 @@
             10,
             -5
         ],
+        "supplier": {
+            "supplier_id": "S001",
+            "supplier_name": "TechWorld Pte Ltd",
+            "contact_email": "sales@techworld.sg"
+        },
         "type": "physical",
         "weight": 0.8
-    },
-    {
-        "product_id": "P006",
-        "product_name": "Monitor",
-        "product_price": 150.0,
-        "current_stock": 3,
-        "transactions": [
-            3
-        ],
-        "type": "physical",
-        "weight": 4.5
     }
 ]

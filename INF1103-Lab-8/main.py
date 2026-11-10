@@ -4,6 +4,7 @@ import math
 
 from physical_product import PhysicalProduct
 from digital_product import DigitalProduct
+from supplier import Supplier
 from inventory import Inventory
 
 invalid_input_counter = 0
@@ -11,6 +12,7 @@ tax_rate = 0.10
 
 inventory = Inventory()
 new_products = []  # Product objects added this session (used for the tax calculation)
+suppliers = {}     # supplier ID (upper case) -> Supplier object, so products can share one Supplier
 
 # the "type" saved in the JSON file decides which class is created when loading
 product_types = {
@@ -28,8 +30,17 @@ filename = os.path.join(script_directory, "inventory.json")
 #               File handling
 # ==================================================
 
-def create_product_from_dict(data):
-    return product_types[data["type"]].from_dict(data)  # KeyError if the type is missing/unknown
+def get_supplier_from_dict(supplier_data, known_suppliers):
+    # reuse the Supplier object if this ID was already seen, so products share ONE Supplier
+    supplier_id = supplier_data["supplier_id"].strip().upper()
+
+    if supplier_id not in known_suppliers:
+        known_suppliers[supplier_id] = Supplier.from_dict(supplier_data)
+    return known_suppliers[supplier_id]
+
+def create_product_from_dict(data, known_suppliers):
+    supplier = get_supplier_from_dict(data["supplier"], known_suppliers)  # KeyError if "supplier" is missing
+    return product_types[data["type"]].from_dict(data, supplier)  # KeyError if the type is missing/unknown
 
 def load_inventory(inventory):
     try:
@@ -48,13 +59,15 @@ def load_inventory(inventory):
             raise ValueError("JSON is not a list of products")
 
         loaded_inventory = Inventory()  # filled first, so a bad file never half-loads
+        loaded_suppliers = {}
 
         for product_data in data:
-             if not loaded_inventory.add_product(create_product_from_dict(product_data)):
+            if not loaded_inventory.add_product(create_product_from_dict(product_data, loaded_suppliers)):
                 raise ValueError("Duplicate product ID")
 
         for product in loaded_inventory.get_products():
             inventory.add_product(product)
+        suppliers.update(loaded_suppliers)
 
         print("Inventory loaded successfully.")
 
@@ -158,6 +171,46 @@ def choose_product_type():
         print("Please enter 1 or 2.")
         invalid_input_counter += 1
 
+def choose_supplier():
+    global invalid_input_counter
+
+    if suppliers:
+        print("Existing suppliers:")
+        for supplier in suppliers.values():
+            supplier.display_information()
+
+    while True:
+        supplier_id = input("Supplier ID: ").strip().upper()
+
+        if not supplier_id or len(supplier_id.split()) > 1:
+            print("Supplier ID cannot be empty or contain spaces.")
+            invalid_input_counter += 1
+            continue
+
+        if supplier_id in suppliers:
+            print(f"Using existing supplier {suppliers[supplier_id].get_name()}.")
+            return suppliers[supplier_id]  # the same Supplier object is shared
+
+        print("New supplier, please enter the details.")
+        supplier_name = input("Supplier Name: ").strip()
+
+        while not supplier_name:
+            print("Supplier name cannot be empty.")
+            invalid_input_counter += 1
+            supplier_name = input("Supplier Name: ").strip()
+
+        while True:
+            contact_email = input("Supplier Email: ").strip()
+            try:
+                supplier = Supplier(supplier_id, supplier_name, contact_email)
+                break
+            except ValueError as error:  # the Supplier class decides what a valid email is
+                print(error)
+                invalid_input_counter += 1
+
+        suppliers[supplier_id] = supplier
+        return supplier
+
 #Option 2
 def add_products():
     global invalid_input_counter
@@ -175,7 +228,7 @@ def add_products():
         invalid_input_counter += 1
         return
 
-    if inventory.search_product(product_id):
+    if inventory.find_product(product_id):
         print(f"Product {product_id} already exists.")
         invalid_input_counter += 1
         return
@@ -187,6 +240,7 @@ def add_products():
         invalid_input_counter += 1
         name = input("Product Name: ").strip()
 
+    supplier = choose_supplier()
     product_type = choose_product_type()
 
     price = get_valid_input("Price: ", float)
@@ -194,10 +248,10 @@ def add_products():
 
     if product_type == "physical":
         weight = get_valid_input("Weight (kg): ", float)
-        product = PhysicalProduct(product_id, name, price, stock, weight)
+        product = PhysicalProduct(product_id, name, price, stock, supplier, weight)
     else:
         download_size = get_valid_input("Download Size (MB): ", float)
-        product = DigitalProduct(product_id, name, price, stock, download_size)
+        product = DigitalProduct(product_id, name, price, stock, supplier, download_size)
     inventory.add_product(product)
     new_products.append(product)  # remembered for this session's tax calculation
     print("\n***** Product added successfully! *****")
@@ -208,7 +262,7 @@ def update_stock():
     global invalid_input_counter
 
     print("Update Stock")
-    product = inventory.search_product(input("Enter Product ID: ").strip())
+    product = inventory.find_product(input("Enter Product ID: ").strip())
 
     if not product:
         print("Product not found.")
@@ -238,7 +292,7 @@ def search_product():
     global invalid_input_counter
 
     print("Search Product")
-    product = inventory.search_product(input("Enter Product ID: ").strip())
+    product = inventory.find_product(input("Enter Product ID: ").strip())
 
     if not product:
         print("Product not found.")

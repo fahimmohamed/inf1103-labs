@@ -1,11 +1,12 @@
 from product import Product
+from supplier import Supplier
 
 
 class DigitalProduct(Product):
     """A product delivered by download. A DigitalProduct IS-A Product."""
 
-    def __init__(self, product_id, name, price, stock, download_size, transactions=None):
-        super().__init__(product_id, name, price, stock, transactions)  # reuse Product's constructor
+    def __init__(self, product_id, name, price, stock, supplier: Supplier, download_size, transactions=None):
+        super().__init__(product_id, name, price, stock, supplier, transactions)  # reuse Product's constructor
         self.__download_size = self._check_number(download_size, "Download size")
 
     def get_download_size(self):
@@ -30,6 +31,7 @@ class DigitalProduct(Product):
         return data
 
     @staticmethod
-    def from_dict(data):
+    def from_dict(data, supplier: Supplier):
+        # the Supplier object is created (or reused) by the caller and passed in
         return DigitalProduct(data["product_id"], data["product_name"], data["product_price"],
-                              data["current_stock"], data["download_size"], data["transactions"])
+                              data["current_stock"], supplier, data["download_size"], data["transactions"])
