@@ -6,6 +6,7 @@ from physical_product import PhysicalProduct
 from digital_product import DigitalProduct
 from supplier import Supplier
 from inventory import Inventory
+from order import Order
 
 invalid_input_counter = 0
 tax_rate = 0.10
@@ -13,6 +14,7 @@ tax_rate = 0.10
 inventory = Inventory()
 new_products = []  # Product objects added this session (used for the tax calculation)
 suppliers = {}     # supplier ID (upper case) -> Supplier object, so products can share one Supplier
+orders = []
 
 # the "type" saved in the JSON file decides which class is created when loading
 product_types = {
@@ -304,11 +306,73 @@ def search_product():
     product.display_information(detailed=True)
     print("-" * 48)
 
+#Option 6
+def create_order():
+    global invalid_input_counter
 
-#Option 6 (report shown on exit)
+    print("Create Order")
+    print("-" * 48)
+    order_id = input("Order ID: ").strip().upper()
+
+    if not order_id or len(order_id.split()) > 1:
+        print("Order ID cannot be empty or contain spaces.")
+        invalid_input_counter += 1
+        return
+
+    for existing_order in orders:
+        if existing_order.get_order_id() == order_id:
+            print(f"Order {order_id} already exists.")
+            invalid_input_counter += 1
+            return
+
+    order = Order(order_id)
+
+    while True:
+        print("\nEnter a Product ID to add, R to remove a line, or press Enter to finish.")
+        product_id = input("Product ID: ").strip()
+
+        if product_id == "":
+            break
+
+        if product_id.upper() == "R":
+            removed = order.remove_order_line(input("Product ID to remove: "))  # removed THROUGH the Order
+            if removed:
+                print("Order line removed.")
+            else:
+                print("That product is not in this order.")
+                invalid_input_counter += 1
+            continue
+
+        product = inventory.find_product(product_id)
+
+        if not product:
+            print("Product not found.")
+            invalid_input_counter += 1
+            continue
+
+        quantity = get_valid_input("Quantity: ", int)
+
+        try:
+            order.add_order_line(product, quantity)  # the Order creates the OrderLine itself
+            print(f"Added {quantity} x {product.get_name()}.")
+        except ValueError as error:  # e.g. quantity 0 or product already in the order
+            print(error)
+            invalid_input_counter += 1
+
+    if not order.get_order_lines():
+        print("Order cancelled (no order lines).")
+        return
+
+    print()
+    order.display_information()
+    orders.append(order)
+    print("\n***** Order created successfully! *****")
+
+#Option 7 (report shown on exit)
 def generate_report():
     new_products_value = sum(product.get_value() for product in new_products)
     tax_amount = calculate_tax(new_products_value)
+    orders_value = sum(order.calculate_total() for order in orders)
 
     print(f'''
 ========================================
@@ -320,6 +384,9 @@ Invalid inputs entered: {invalid_input_counter}
 New products this session: {len(new_products)}
 Value of new products: ${new_products_value:.2f}
 Tax on new products ({tax_rate:.0%}): ${tax_amount:.2f}
+----------------------------------------
+Orders created this session: {len(orders)}
+Total value of orders: ${orders_value:.2f}
 ========================================
 ''')
 
@@ -347,7 +414,8 @@ INVENTORY MANAGEMENT SYSTEM
 3. Update Stock or Price
 4. Search Product
 5. Save Inventory
-6. Exit
+6. Create Order
+7. Exit
 ----------------------------\n""")
 
             main_menu_option = input("Enter option: ")
@@ -370,6 +438,9 @@ INVENTORY MANAGEMENT SYSTEM
                     save_inventory(inventory)
 
                 case "6":
+                    create_order()
+
+                case "7":
                     print("Saving inventory before exit...")
                     save_inventory(inventory, show_filename=False)
                     generate_report()
