@@ -5,6 +5,6 @@ class CanBeShipped(ABC):
     """Interface-style contract: anything that can be shipped must calculate its shipping cost."""
 
     @abstractmethod
-    def calculate_shipping_cost(self):
+    def calculate_shipping_cost(self) -> float:
         """Return the cost of shipping this item."""
         pass
