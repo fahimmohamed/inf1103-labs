@@ -7,14 +7,15 @@ from digital_product import DigitalProduct
 from supplier import Supplier
 from inventory import Inventory
 from order import Order
+from product import Product
 
 invalid_input_counter = 0
 tax_rate = 0.10
 
 inventory = Inventory()
-new_products = []  # Product objects added this session (used for the tax calculation)
-suppliers = {}     # supplier ID (upper case) -> Supplier object, so products can share one Supplier
-orders = []
+new_products: list[Product] = []  # Product objects added this session (used for the tax calculation)
+suppliers: dict[str, Supplier] = {}  # supplier ID (upper case) -> Supplier object, so products can share one Supplier
+orders: list[Order] = []  # Order objects created this session (not saved to the JSON file)
 
 # the "type" saved in the JSON file decides which class is created when loading
 product_types = {

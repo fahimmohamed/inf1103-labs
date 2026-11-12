@@ -5,6 +5,7 @@ from physical_product import PhysicalProduct
 from digital_product import DigitalProduct
 from inventory import Inventory
 from order import Order
+from product import Product
 
 
 def test_supplier() -> None:
@@ -144,8 +145,61 @@ def test_composition() -> None:
     print(f"O002 total is still: ${order_2.calculate_total():.2f}")
     print()
 
+def show_product_details(product: Product) -> None:
+    # accepts ANY Product: it never checks which subclass it was given
+    product.display_information()
+    print(product.get_fulfilment_info())
+
+
+def test_lsp() -> None:
+    print("=" * 48)
+    print("TEST: Liskov Substitution (subclasses used as Product)")
+    print("=" * 48)
+
+    supplier = Supplier("S001", "TechWorld Pte Ltd", "sales@techworld.sg")
+    keyboard = PhysicalProduct("P005", "Keyboard", 21.00, 5, supplier, 0.8)
+    office = DigitalProduct("P004", "Office 365", 138.00, 50, supplier, 380.6)
+
+    # 1. the SAME function works with both subclasses, unchanged
+    show_product_details(keyboard)
+    show_product_details(office)
+
+    # 2. both can be managed by an Inventory through normal operations
+    inventory = Inventory()
+    print(f"Add keyboard: {inventory.add_product(keyboard)} | Add office: {inventory.add_product(office)}")
+    print(f"Find P004 returns office: {inventory.find_product('P004') is office}")
+    print(f"Total stock: {inventory.get_total_stock()}")
+
+    # 3. the expectation set by Product.update_stock() holds for BOTH subclasses:
+    #    it sets the new stock, records the change, and returns the change as an int
+    for product in inventory.get_products():
+        change = product.update_stock(product.get_stock() + 10)
+        print(f"{product.get_product_id()}: change returned = {change} ({type(change).__name__}), "
+              f"stock = {product.get_stock()}, transactions = {product.get_transactions()}")
+    print()
+
+
+def test_polymorphism() -> None:
+    print("=" * 48)
+    print("TEST: Polymorphism (one loop over the Product collection)")
+    print("Predict first (7.2): write your prediction BEFORE running")
+    print("=" * 48)
+
+    supplier = Supplier("S001", "TechWorld Pte Ltd", "sales@techworld.sg")
+    inventory = Inventory()
+    inventory.add_product(PhysicalProduct("P001", "Laptop", 1200.00, 15, supplier, 2.2))
+    inventory.add_product(DigitalProduct("P003", "Antivirus Software", 49.99, 100, supplier, 250.0))
+
+    # ONE loop, no isinstance(): each object runs its own version of the methods
+    for product in inventory.get_products():
+        product.display_information()
+        print(product.get_fulfilment_info())
+        print()
+
 if __name__ == "__main__":
     test_supplier()
     test_association()
     test_aggregation()
     test_composition()
+    test_lsp()
+    test_polymorphism()
