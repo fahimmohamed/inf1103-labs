@@ -1,0 +1,84 @@
+[
+    {
+        "product_id": "P001",
+        "product_name": "Laptop",
+        "product_price": 1200.0,
+        "current_stock": 15,
+        "transactions": [
+            15
+        ],
+        "supplier": {
+            "supplier_id": "S001",
+            "supplier_name": "TechWorld Pte Ltd",
+            "contact_email": "sales@techworld.sg"
+        },
+        "type": "physical",
+        "weight": 2.2
+    },
+    {
+        "product_id": "P002",
+        "product_name": "Mouse",
+        "product_price": 25.5,
+        "current_stock": 40,
+        "transactions": [
+            40
+        ],
+        "supplier": {
+            "supplier_id": "S001",
+            "supplier_name": "TechWorld Pte Ltd",
+            "contact_email": "sales@techworld.sg"
+        },
+        "type": "physical",
+        "weight": 0.1
+    },
+    {
+        "product_id": "P003",
+        "product_name": "Antivirus Software",
+        "product_price": 49.99,
+        "current_stock": 100,
+        "transactions": [
+            100
+        ],
+        "supplier": {
+            "supplier_id": "S002",
+            "supplier_name": "SoftSource Pte Ltd",
+            "contact_email": "orders@softsource.sg"
+        },
+        "type": "digital",
+        "download_size": 250.0
+    },
+    {
+        "product_id": "P004",
+        "product_name": "Office 365",
+        "product_price": 138.0,
+        "current_stock": 20,
+        "transactions": [
+            50,
+            -30
+        ],
+        "supplier": {
+            "supplier_id": "S002",
+            "supplier_name": "SoftSource Pte Ltd",
+            "contact_email": "orders@softsource.sg"
+        },
+        "type": "digital",
+        "download_size": 380.6
+    },
+    {
+        "product_id": "P005",
+        "product_name": "Keyboard",
+        "product_price": 21.0,
+        "current_stock": 5,
+        "transactions": [
+            10,
+            -5
+        ],
+        "supplier": {
+            "supplier_id": "S001",
+            "supplier_name": "TechWorld Pte Ltd",
+            "contact_email": "sales@techworld.sg"
+        },
+        "type": "physical",
+        "weight": 0.8
+    }
+]
