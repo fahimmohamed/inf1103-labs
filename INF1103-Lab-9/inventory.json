@@ -80,5 +80,21 @@
         },
         "type": "physical",
         "weight": 0.8
+    },
+    {
+        "product_id": "P006",
+        "product_name": "Monitor",
+        "product_price": 120.0,
+        "current_stock": 10,
+        "transactions": [
+            10
+        ],
+        "supplier": {
+            "supplier_id": "S003",
+            "supplier_name": "NewTech Pte Ltd",
+            "contact_email": "enquiry@newtech.sg"
+        },
+        "type": "physical",
+        "weight": 3.0
     }
 ]
