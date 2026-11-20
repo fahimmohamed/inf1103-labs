@@ -44,7 +44,10 @@ class Product(ABC):
         return float(value) + 0  # + 0 turns -0.0 into 0.0
 
     def __valid_price(self, price: float) -> float:
-        return round(self._check_number(price, "Price"), 2)
+        price = round(self._check_number(price, "Price"), 2)
+        if price <= 0:  # validation: the Product owns its price rule
+            raise ValueError("Price must be greater than zero.")
+        return price
 
     def __valid_stock(self, stock: int) -> int:
         if isinstance(stock, bool) or not isinstance(stock, int):

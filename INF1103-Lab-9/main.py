@@ -2,12 +2,11 @@ import os
 import json
 import math
 
-from physical_product import PhysicalProduct
-from digital_product import DigitalProduct
+from product import Product
+from product_factory import ProductFactory
 from supplier import Supplier
 from inventory import Inventory
 from order import Order
-from product import Product
 
 invalid_input_counter = 0
 tax_rate = 0.10
@@ -16,12 +15,6 @@ inventory = Inventory()
 new_products: list[Product] = []  # Product objects added this session (used for the tax calculation)
 suppliers: dict[str, Supplier] = {}  # supplier ID (upper case) -> Supplier object, so products can share one Supplier
 orders: list[Order] = []  # Order objects created this session (not saved to the JSON file)
-
-# the "type" saved in the JSON file decides which class is created when loading
-product_types = {
-    "physical": PhysicalProduct,
-    "digital": DigitalProduct,
-}
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 filename = os.path.join(script_directory, "inventory.json")
@@ -35,7 +28,12 @@ filename = os.path.join(script_directory, "inventory.json")
 
 def get_supplier_from_dict(supplier_data, known_suppliers):
     # reuse the Supplier object if this ID was already seen, so products share ONE Supplier
-    supplier_id = supplier_data["supplier_id"].strip().upper()
+    supplier_id = supplier_data["supplier_id"]
+
+    if not isinstance(supplier_id, str):  # e.g. 101 instead of "101" would crash .strip()
+        raise ValueError("Supplier ID must be text.")
+
+    supplier_id = supplier_id.strip().upper()
 
     if supplier_id not in known_suppliers:
         known_suppliers[supplier_id] = Supplier.from_dict(supplier_data)
@@ -43,7 +41,7 @@ def get_supplier_from_dict(supplier_data, known_suppliers):
 
 def create_product_from_dict(data, known_suppliers):
     supplier = get_supplier_from_dict(data["supplier"], known_suppliers)  # KeyError if "supplier" is missing
-    return product_types[data["type"]].from_dict(data, supplier)  # KeyError if the type is missing/unknown
+    return ProductFactory.create_from_dict(data, supplier)  # ValueError if the type is unknown
 
 def load_inventory(inventory):
     try:
@@ -148,6 +146,35 @@ def get_valid_input(prompt, cast, default=None):
         return value + 0  # turns -0.0 into 0.0
 
 
+#Ask until a positive amount is entered (e.g. a price)
+def get_positive_float(prompt: str, default: float | None = None) -> float:
+    global invalid_input_counter
+
+    while True:
+        user_input = input(prompt).strip()
+
+        if default is not None and user_input == "":
+            return default  # Enter keeps the current value
+
+        try:
+            if "_" in user_input:  # Python accepts 1_000, which we do not want
+                raise ValueError
+            value = float(user_input)  # raises ValueError for text like "abc"
+            if not math.isfinite(value):  # nan / inf are not real amounts
+                raise ValueError
+        except ValueError:
+            print("Please enter a valid number, e.g. 12.50")
+            invalid_input_counter += 1
+            continue
+
+        if round(value, 2) <= 0:  # amounts are kept to cents, so 0.001 counts as 0
+            print("Please enter a number greater than zero.")
+            invalid_input_counter += 1
+            continue
+
+        return value
+
+
 def calculate_tax(amount):
     # tax = amount x tax rate (10%), rounded to cents
     return round(amount * tax_rate, 2)
@@ -246,15 +273,15 @@ def add_products():
     supplier = choose_supplier()
     product_type = choose_product_type()
 
-    price = get_valid_input("Price: ", float)
+    price = get_positive_float("Price: ")
     stock = get_valid_input("Stock Quantity: ", int)
 
     if product_type == "physical":
-        weight = get_valid_input("Weight (kg): ", float)
-        product = PhysicalProduct(product_id, name, price, stock, supplier, weight)
+        size = get_valid_input("Weight (kg): ", float)
     else:
-        download_size = get_valid_input("Download Size (MB): ", float)
-        product = DigitalProduct(product_id, name, price, stock, supplier, download_size)
+        size = get_valid_input("Download Size (MB): ", float)
+
+    product = ProductFactory.create(product_type, product_id, name, price, stock, supplier, size)
     inventory.add_product(product)
     new_products.append(product)  # remembered for this session's tax calculation
     print("\n***** Product added successfully! *****")
@@ -279,7 +306,7 @@ def update_stock():
     print("(Press Enter to keep a current value)")
 
     new_stock = get_valid_input("New Stock Quantity: ", int, product.get_stock())
-    new_price = round(get_valid_input("New Price: ", float, product.get_price()), 2)
+    new_price = round(get_positive_float("New Price: ", product.get_price()), 2)
 
     if new_stock == product.get_stock() and new_price == product.get_price():
         print("No changes made.")
@@ -306,6 +333,7 @@ def search_product():
     print("-" * 48)
     product.display_information(detailed=True)
     print("-" * 48)
+
 
 #Option 6
 def create_order():
@@ -368,6 +396,7 @@ def create_order():
     order.display_information()
     orders.append(order)
     print("\n***** Order created successfully! *****")
+
 
 #Option 7 (report shown on exit)
 def generate_report():
@@ -449,7 +478,7 @@ INVENTORY MANAGEMENT SYSTEM
 
                 case _:
                     invalid_input_counter += 1
-                    print("***** Please enter a valid option from 1-6 *****")
+                    print("***** Please enter a valid option from 1-7 *****")
                     print("*****    No Alphabets or symbols please    *****")
 
     except (EOFError, KeyboardInterrupt):

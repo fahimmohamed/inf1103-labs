@@ -38,9 +38,3 @@ class PhysicalProduct(Product, CanBeShipped):
         data["type"] = "physical"
         data["weight"] = self.__weight
         return data
-
-    @staticmethod
-    def from_dict(data: dict, supplier: Supplier) -> "PhysicalProduct":
-        # the Supplier object is created (or reused) by the caller and passed in
-        return PhysicalProduct(data["product_id"], data["product_name"], data["product_price"],
-                               data["current_stock"], supplier, data["weight"], data["transactions"])

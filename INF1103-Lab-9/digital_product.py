@@ -30,9 +30,3 @@ class DigitalProduct(Product):
         data["type"] = "digital"
         data["download_size"] = self.__download_size
         return data
-
-    @staticmethod
-    def from_dict(data: dict, supplier: Supplier) -> "DigitalProduct":
-        # the Supplier object is created (or reused) by the caller and passed in
-        return DigitalProduct(data["product_id"], data["product_name"], data["product_price"],
-                              data["current_stock"], supplier, data["download_size"], data["transactions"])
